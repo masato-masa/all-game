@@ -10,6 +10,7 @@
 | ヘビパズル | https://masato-masa.github.io/snake-puzzle/ | [snake-puzzle](https://github.com/masato-masa/snake-puzzle) |
 | 数式パズル | https://masato-masa.github.io/math-puzzle/ | [math-puzzle](https://github.com/masato-masa/math-puzzle) |
 | ねこめいろ | https://masato-masa.github.io/cat-maze/ | [cat-maze](https://github.com/masato-masa/cat-maze) |
+| にゃんどく | https://masato-masa.github.io/nyandoku/ | [nyandoku](https://github.com/masato-masa/nyandoku) |
 | アルバム（ゲームではない） | https://masato-masa.github.io/7242/ | [7242](https://github.com/masato-masa/7242) |
 
 `index.html` 1枚だけの静的ページ。表紙の画像は各サイトを実際に開いて切り出したもので、
