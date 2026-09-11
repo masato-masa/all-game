@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>名もなき神 - 村育成デモ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Serif+JP:wght@400;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-void: #0d0b16;
+    --bg-panel: #1c1726;
+    --bg-panel-2: #241d33;
+    --gold: #c9a227;
+    --gold-soft: #e8c96a;
+    --violet: #7c5cc4;
+    --violet-soft: #a68ae0;
+    --parchment: #ece2c6;
+    --parchment-dim: #b6ab8e;
+    --danger: #b34a3a;
+    --safe: #6f9b6a;
+    --line: rgba(236,226,198,0.14);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse at 30% -10%, rgba(124,92,196,0.18), transparent 55%),
+      radial-gradient(ellipse at 90% 10%, rgba(201,162,39,0.10), transparent 45%),
+      var(--bg-void);
+    color:var(--parchment);
+    font-family:'Zen Kaku Gothic New','Noto Serif JP',sans-serif;
+    min-height:100vh;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 60px;}
+
+  .title-row{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:6px;}
+  h1{
+    font-family:'Cinzel',serif;
+    font-weight:700;
+    font-size:26px;
+    letter-spacing:0.04em;
+    margin:0;
+    background:linear-gradient(180deg,var(--gold-soft),var(--gold));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .stage-tag{
+    font-size:12px;letter-spacing:0.1em;color:var(--violet-soft);
+    border:1px solid rgba(166,138,224,0.4);
+    padding:4px 10px;border-radius:999px;
+    background:rgba(124,92,196,0.08);
+  }
+  .subtitle{color:var(--parchment-dim);font-size:13px;margin-bottom:22px;}
+
+  .meterbar{
+    display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:22px;
+  }
+  .meter{
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:10px 12px;
+    position:relative;
+    overflow:hidden;
+  }
+  .meter .label{font-size:11px;color:var(--parchment-dim);letter-spacing:0.05em;}
+  .meter .val{font-family:'Cinzel',serif;font-size:20px;font-weight:700;margin-top:2px;}
+  .meter.faith .val{color:var(--gold-soft);}
+  .meter.god .val{color:var(--violet-soft);}
+  .meter.food .val{color:#9fd18a;}
+  .meter.mat .val{color:#9cc2e8;}
+  .meter.happy .val{color:#e8b76a;}
+  .meter.sec .val{color:#d98a7a;}
+
+  .layout{display:grid;grid-template-columns:1.15fr 0.85fr;gap:18px;}
+  @media(max-width:880px){.layout{grid-template-columns:1fr;} .meterbar{grid-template-columns:repeat(3,1fr);}}
+
+  .panel{
+    background:linear-gradient(180deg,var(--bg-panel),var(--bg-panel-2));
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:18px;
+    margin-bottom:18px;
+  }
+  .panel h2{
+    font-family:'Cinzel',serif;
+    font-size:14px;letter-spacing:0.08em;
+    color:var(--gold-soft);
+    margin:0 0 12px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .panel h2::before{content:'';width:6px;height:6px;background:var(--gold);border-radius:50%;box-shadow:0 0 8px var(--gold);}
+
+  .chars{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+  @media(max-width:520px){.chars{grid-template-columns:1fr;}}
+  .charcard{
+    background:rgba(13,11,22,0.5);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px;
+    transition:border-color .2s;
+  }
+  .charcard.injured{border-color:rgba(179,74,58,0.6);}
+  .charcard.anxious{border-color:rgba(166,138,224,0.6);}
+  .chead{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+  .portrait{
+    width:40px;height:40px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;
+    border:1px solid rgba(236,226,198,0.25);
+    flex-shrink:0;
+  }
+  .portrait.gain{background:radial-gradient(circle at 35% 30%, #6b4a3a, #3a2620);}
+  .portrait.meia{background:radial-gradient(circle at 35% 30%, #7a5540, #3e2c22);}
+  .portrait.noah{background:radial-gradient(circle at 35% 30%, #4a6b52, #223a28);}
+  .portrait.dorn{background:radial-gradient(circle at 35% 30%, #5a5040, #2c2820);}
+  .cname{font-weight:700;font-size:14px;}
+  .crole{font-size:11px;color:var(--parchment-dim);}
+  .cstats{font-size:11px;color:var(--parchment-dim);display:flex;flex-direction:column;gap:4px;}
+  .barrow{display:flex;align-items:center;gap:6px;}
+  .barrow .barlabel{width:44px;flex-shrink:0;}
+  .bartrack{flex:1;height:5px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;}
+  .barfill{height:100%;border-radius:3px;}
+  .status-badges{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;}
+  .badge{font-size:10px;padding:2px 6px;border-radius:6px;background:rgba(255,255,255,0.06);color:var(--parchment-dim);}
+  .badge.warn{background:rgba(179,74,58,0.2);color:#e0a394;}
+  .badge.buff{background:rgba(124,92,196,0.2);color:var(--violet-soft);}
+
+  textarea{
+    width:100%;background:rgba(13,11,22,0.6);
+    border:1px solid var(--line);border-radius:10px;
+    color:var(--parchment);font-family:inherit;font-size:13px;
+    padding:10px 12px;resize:none;min-height:56px;
+  }
+  textarea:focus{outline:none;border-color:var(--gold);}
+  .oracle-row{display:flex;gap:10px;margin-top:10px;align-items:center;flex-wrap:wrap;}
+  .cooldown{font-size:11px;color:var(--parchment-dim);white-space:nowrap;}
+
+  button{
+    font-family:inherit;cursor:pointer;border:none;
+  }
+  button:focus-visible{outline:2px solid var(--gold-soft);outline-offset:2px;}
+  .btn-primary{
+    background:linear-gradient(180deg,var(--gold-soft),var(--gold));
+    color:#241c08;font-weight:700;font-size:13px;
+    padding:10px 18px;border-radius:8px;
+    letter-spacing:0.02em;
+    transition:transform .15s, box-shadow .15s;
+  }
+  .btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 14px rgba(201,162,39,0.35);}
+  .btn-primary:disabled{opacity:0.35;cursor:not-allowed;}
+
+  .btn-ghost{
+    background:transparent;border:1px solid var(--line);
+    color:var(--parchment);font-size:12px;padding:8px 14px;border-radius:8px;
+  }
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft);}
+
+  .miracles{display:flex;flex-direction:column;gap:8px;}
+  .miracle{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:rgba(124,92,196,0.06);
+    border:1px solid rgba(124,92,194,0.25);
+    border-radius:10px;padding:9px 12px;
+    flex-wrap:wrap;
+  }
+  .miracle .mname{font-size:13px;font-weight:700;color:var(--violet-soft);}
+  .miracle .mdesc{font-size:11px;color:var(--parchment-dim);margin-top:2px;}
+  .miracle .mcost{
+    font-family:'Cinzel',serif;font-size:12px;color:var(--violet-soft);
+    border:1px solid rgba(166,138,224,0.4);
+    border-radius:999px;padding:3px 9px;flex-shrink:0;
+  }
+  .mbtn{
+    background:rgba(124,92,194,0.18);color:var(--violet-soft);
+    border:1px solid rgba(166,138,224,0.4);
+    font-size:11px;padding:6px 10px;border-radius:6px;flex-shrink:0;
+  }
+  .mbtn:hover:not(:disabled){background:rgba(124,92,194,0.32);}
+  .mbtn:disabled{opacity:0.3;cursor:not-allowed;}
+
+  .log{
+    max-height:260px;overflow-y:auto;
+    display:flex;flex-direction:column-reverse;
+    gap:6px;
+  }
+  .log-entry{
+    font-size:12.5px;line-height:1.5;
+    padding:8px 10px;border-radius:8px;
+    background:rgba(13,11,22,0.4);
+    border-left:2px solid var(--line);
+  }
+  .log-entry.good{border-left-color:var(--safe);}
+  .log-entry.bad{border-left-color:var(--danger);}
+  .log-entry.oracle{border-left-color:var(--gold);}
+  .log-entry.miracle{border-left-color:var(--violet);}
+  .log-time{color:var(--parchment-dim);font-size:10px;margin-right:6px;}
+
+  .tick-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+
+  .footer-note{
+    margin-top:20px;font-size:11px;color:var(--parchment-dim);
+    border-top:1px solid var(--line);padding-top:12px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="title-row">
+    <h1>名もなき神 &mdash; 村育成デモ</h1>
+    <span class="stage-tag" id="stageTag">開拓期</span>
+  </div>
+  <div class="subtitle">お告げ（間接介入）と神ポイント（直接介入）でコアループを検証するプロトタイプ</div>
+
+  <div class="meterbar">
+    <div class="meter faith"><div class="label">信仰値</div><div class="val" id="mFaith">0</div></div>
+    <div class="meter god"><div class="label">神ポイント</div><div class="val" id="mGod">0 / 5</div></div>
+    <div class="meter food"><div class="label">食料</div><div class="val" id="mFood">30</div></div>
+    <div class="meter mat"><div class="label">資材</div><div class="val" id="mMat">20</div></div>
+    <div class="meter happy"><div class="label">幸福度</div><div class="val" id="mHappy">70</div></div>
+    <div class="meter sec"><div class="label">治安</div><div class="val" id="mSec">50</div></div>
+  </div>
+
+  <div class="layout">
+    <div>
+      <div class="panel">
+        <h2>民（開拓者）</h2>
+        <div class="chars" id="charGrid"></div>
+      </div>
+
+      <div class="panel">
+        <h2>お告げを送る（間接介入）</h2>
+        <textarea id="oracleInput" placeholder="例：畑を耕せ／敵に備えよ／少し休め　――言葉は完全には伝わらないこともある"></textarea>
+        <div class="oracle-row">
+          <button class="btn-primary" id="sendOracle">お告げを送る</button>
+          <span class="cooldown" id="oracleCooldown">残り 3 回（このセッション）</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h2>神ポイント：直接介入（奇跡）</h2>
+        <div class="miracles" id="miracleList"></div>
+      </div>
+
+      <div class="panel">
+        <h2>時の流れ</h2>
+        <div style="font-size:12px;color:var(--parchment-dim);">「時を進める」で放置時間の経過をシミュレートします（デモ用の早送り）</div>
+        <div class="tick-row">
+          <button class="btn-ghost" id="tickBtn">時を進める（+1刻）</button>
+          <button class="btn-ghost" id="resetBtn">最初からやり直す</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>出来事の記録</h2>
+        <div class="log" id="logList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    キーワード辞書・キャラクターデータ・神ポイント効果は設計ドキュメント（v0.2）の内容をそのまま実装したプロトタイプです。ここでの数値バランスは仮のものです。
+  </div>
+</div>
+
+<script>
+(function(){
+
+  const oracleDictionary = {
+    categories: [
+      { id:"frontier", label:"開拓・拡大", keywords:["広げろ","開拓","新天地","土地","進め","拡大"],
+        apply:(s)=>{ s.resources.materials-=5; addLog(`民は開拓の意志を汲み取り、周囲へ足を延ばした。`,"oracle"); } },
+      { id:"production", label:"農業・生産", keywords:["畑","耕せ","実り","収穫","育てろ","育て"],
+        apply:(s)=>{ s.resources.food+=20; bumpFatigue(5); addLog(`メイアたちは実りへの祈りを受け取り、食料を集めた。`,"oracle"); } },
+      { id:"combat", label:"戦闘・防衛", keywords:["戦え","守れ","敵","武器","備えよ","備える","戦闘"],
+        apply:(s)=>{ s.meters.security+=10; s.meters.happiness-=5; addLog(`ガインは警護を強め、周囲に緊張が走った。`,"oracle"); } },
+      { id:"faith", label:"信仰・儀式", keywords:["祈れ","捧げよ","感謝","祭り","神殿","祈り"],
+        apply:(s)=>{ s.meters.faith+=15; s.resources.materials-=5; addLog(`ドルンが小さな祈りの場を整え、信仰が集まった。`,"oracle"); } },
+      { id:"commerce", label:"商業・交易", keywords:["売れ","買え","商人","交易","市場"],
+        apply:(s)=>{ s.resources.materials+=10; s.resources.food-=5; addLog(`メイアは手持ちの品を上手くやりくりした。`,"oracle"); } },
+      { id:"rest", label:"休息・慈愛", keywords:["休め","癒せ","労われ","優しく","休息"],
+        apply:(s)=>{ bumpFatigue(-15); s.meters.happiness+=10; addLog(`民は束の間、肩の力を抜くことができた。`,"oracle"); } },
+      { id:"discipline", label:"規律・統制", keywords:["従え","厳しく","罰せよ","規律"],
+        apply:(s)=>{ s.meters.security+=15; s.meters.happiness-=10; addLog(`規律が引き締まったが、どこか息苦しさも残った。`,"oracle"); } },
+    ],
+    fallback:(s)=>{ addLog(`民たちはお告げの意味を測りかねている……（解釈が伝わらなかった）`,"bad"); }
+  };
+
+  const miracleDefs = [
+    { id:"blessed_rain", name:"恵みの雨", cost:1, desc:"食料+40（確定）",
+      apply:(s)=>{ s.resources.food+=40; addLog(`天から恵みの雨が降り、大地が潤った。`,"miracle"); } },
+    { id:"clear_sky", name:"晴天の加護", cost:1, desc:"資材+25（確定）",
+      apply:(s)=>{ s.resources.materials+=25; addLog(`晴天の加護により、作業が捗った。`,"miracle"); } },
+    { id:"warning_wind", name:"追い風の予兆", cost:2, desc:"治安+20、次の襲撃を軽減",
+      apply:(s)=>{ s.meters.security+=20; s.threatMitigated=true; addLog(`不穏な気配が和らいだ。神の風が村を包んでいる。`,"miracle"); } },
+    { id:"thunder_wrath", name:"雷雲の怒り", cost:3, desc:"次の戦闘で敵を弱体化",
+      apply:(s)=>{ s.nextBattleBuff=true; addLog(`遠雷が轟いた。次の脅威にはこの加護が働くだろう。`,"miracle"); } },
+    { id:"healing_light", name:"傷の癒し", cost:2, desc:"負傷キャラを全回復",
+      apply:(s)=>{ let healed=false; characters.forEach(c=>{ if(c.condition.injured){c.condition.injured=false; healed=true;} });
+        addLog(healed?`光がガインの傷を癒した。`:`癒すべき傷はなかったが、光は静かに村を照らした。`,"miracle"); } },
+    { id:"small_miracle_noah", name:"小さな奇跡", cost:1, desc:"ノアの不安を解消し幸福度UP",
+      apply:(s)=>{ const noah=characters.find(c=>c.id==="noah"); noah.condition.anxious=false; s.meters.happiness+=8;
+        addLog(`ノアの瞳に、再び好奇心の光が灯った。`,"miracle"); } },
+  ];
+
+  let characters, state, oracleUsesLeft;
+
+  function freshCharacters(){
+    return [
+      { id:"gain", name:"ガイン", role:"戦士", emoji:"⚔️", cls:"gain",
+        combatAptitude:"high", combatPower:80,
+        condition:{loyalty:60, fatigue:10, morale:70, injured:false} },
+      { id:"meia", name:"メイア", role:"女性", emoji:"🌿", cls:"meia",
+        combatAptitude:"low", combatPower:15,
+        condition:{loyalty:65, fatigue:10, morale:75, injured:false} },
+      { id:"noah", name:"ノア", role:"子供", emoji:"✨", cls:"noah",
+        combatAptitude:"none", combatPower:0,
+        condition:{loyalty:100, fatigue:0, morale:90, anxious:false} },
+      { id:"dorn", name:"ドルン", role:"おじいさん", emoji:"📜", cls:"dorn",
+        combatAptitude:"medium", combatPower:25,
+        condition:{loyalty:70, fatigue:5, morale:80, injured:false} },
+    ];
+  }
+
+  function freshState(){
+    return {
+      stage:"開拓期",
+      resources:{food:30, materials:20},
+      meters:{faith:0, godPoints:0, godPointsCap:5, happiness:70, security:50},
+      threatMitigated:false,
+      nextBattleBuff:false,
+      tickCount:0,
+    };
+  }
+
+  function init(){
+    characters = freshCharacters();
+    state = freshState();
+    oracleUsesLeft = 3;
+    document.getElementById('logList').innerHTML = "";
+    addLog(`森をさまよっていた4人は、ひとつの拠点にたどり着いた。ここから、あなたの見守りが始まる。`,"good");
+    renderAll();
+  }
+
+  function bumpFatigue(v){
+    characters.forEach(c=>{ if(c.condition.fatigue!==undefined) c.condition.fatigue = clamp(c.condition.fatigue+v,0,100); });
+  }
+
+  function clamp(v,min,max){ return Math.max(min,Math.min(max,v)); }
+
+  function addLog(msg, type){
+    const list = document.getElementById('logList');
+    const div = document.createElement('div');
+    div.className = 'log-entry ' + (type||'');
+    const time = document.createElement('span');
+    time.className='log-time';
+    time.textContent = `刻${state ? state.tickCount : 0}`;
+    div.appendChild(time);
+    div.appendChild(document.createTextNode(msg));
+    list.appendChild(div);
+    list.scrollTop = list.scrollHeight;
+  }
+
+  function matchOracle(text){
+    const matched = [];
+    oracleDictionary.categories.forEach(cat=>{
+      if(cat.keywords.some(k=>text.includes(k))) matched.push(cat);
+    });
+    return matched;
+  }
+
+  function sendOracle(){
+    const input = document.getElementById('oracleInput');
+    const text = input.value.trim();
+    if(!text){ return; }
+    if(oracleUsesLeft<=0){ addLog(`神託を送る力が尽きている。時を進めて回復を待とう。`,"bad"); return; }
+
+    const dornAlive = characters.find(c=>c.id==='dorn');
+    const precisionBoost = dornAlive ? 0.3 : 0;
+    const matched = matchOracle(text);
+
+    if(matched.length===0){
+      if(Math.random() < precisionBoost){
+        addLog(`ドルンがお告げの真意を読み解いた。「これはきっと、こういう意味だろう」`,"oracle");
+        oracleDictionary.categories[Math.floor(Math.random()*oracleDictionary.categories.length)].apply(state);
+      } else {
+        oracleDictionary.fallback(state);
+      }
+    } else {
+      matched.forEach(cat=>cat.apply(state));
+    }
+
+    oracleUsesLeft--;
+    input.value="";
+    clampState();
+    renderAll();
+  }
+
+  function clampState(){
+    state.resources.food = clamp(state.resources.food,0,999);
+    state.resources.materials = clamp(state.resources.materials,0,999);
+    state.meters.happiness = clamp(state.meters.happiness,0,100);
+    state.meters.security = clamp(state.meters.security,0,100);
+    characters.forEach(c=>{
+      if(c.condition.fatigue!==undefined) c.condition.fatigue = clamp(c.condition.fatigue,0,100);
+      if(c.condition.loyalty!==undefined) c.condition.loyalty = clamp(c.condition.loyalty,0,100);
+      if(c.condition.morale!==undefined) c.condition.morale = clamp(c.condition.morale,0,100);
+    });
+    while(state.meters.faith>=20 && state.meters.godPoints<state.meters.godPointsCap){
+      state.meters.faith-=20;
+      state.meters.godPoints++;
+      addLog(`信仰が実を結び、神ポイントが1増えた。`,"good");
+    }
+  }
+
+  function useMiracle(def){
+    if(state.meters.godPoints < def.cost) return;
+    state.meters.godPoints -= def.cost;
+    def.apply(state);
+    clampState();
+    renderAll();
+  }
+
+  function tick(){
+    state.tickCount++;
+    oracleUsesLeft = Math.min(3, oracleUsesLeft+1);
+
+    state.resources.food -= 8;
+    if(state.resources.food < 0){
+      state.resources.food = 0;
+      state.meters.happiness -= 10;
+      addLog(`食料が尽きかけている。民の顔に不安が浮かぶ。`,"bad");
+    }
+
+    characters.forEach(c=>{ if(c.condition.fatigue!==undefined) c.condition.fatigue = clamp(c.condition.fatigue-4,0,100); });
+
+    const noah = characters.find(c=>c.id==='noah');
+    if(state.meters.happiness < 40 && !noah.condition.anxious && Math.random()<0.4){
+      noah.condition.anxious = true;
+      addLog(`ノアが不安げな表情を見せている……。`,"bad");
+    }
+    if(noah.condition.anxious){
+      state.meters.happiness -= 2;
+    } else {
+      state.meters.happiness += 1;
+    }
+
+    const securityFactor = (100 - state.meters.security)/100;
+    let threatChance = 0.15 + securityFactor*0.25;
+    if(state.threatMitigated){ threatChance *= 0.4; state.threatMitigated=false; }
+
+    if(Math.random() < threatChance){
+      resolveThreat();
+    } else {
+      if(Math.random()<0.2){
+        state.resources.materials += 5;
+        addLog(`旅の民が立ち寄り、わずかな資材を分けてくれた。`,"good");
+      }
+    }
+
+    clampState();
+    renderAll();
+  }
+
+  function resolveThreat(){
+    addLog(`不穏な気配……魔物の群れが村に迫っている！`,"bad");
+    let combatPower = characters.reduce((sum,c)=>{
+      if(c.combatAptitude==='high') return sum + c.combatPower;
+      if(c.combatAptitude==='medium') return sum + c.combatPower*0.6;
+      return sum + c.combatPower*0.1;
+    },0);
+
+    let enemyPower = 40 + state.tickCount*3 + Math.random()*30;
+    if(state.nextBattleBuff){ enemyPower *= 0.7; state.nextBattleBuff=false; addLog(`雷雲の加護が敵の力を削いだ。`,"miracle"); }
+
+    if(combatPower >= enemyPower){
+      addLog(`ガインを中心に、村は襲撃を退けた。民は安堵の息をついた。`,"good");
+      state.meters.happiness += 5;
+      state.meters.faith += 8;
+    } else {
+      const gain = characters.find(c=>c.id==='gain');
+      if(!gain.condition.injured && Math.random()<0.6){
+        gain.condition.injured = true;
+        addLog(`ガインが負傷しながらも、村人たちを逃がした。被害は最小限に抑えられた。`,"bad");
+      } else {
+        addLog(`村は襲撃を受け、資材と食料の一部が失われた。`,"bad");
+      }
+      state.resources.food = Math.max(0, state.resources.food-15);
+      state.resources.materials = Math.max(0, state.resources.materials-10);
+      state.meters.happiness -= 8;
+    }
+  }
+
+  function renderMeters(){
+    document.getElementById('mFaith').textContent = state.meters.faith;
+    document.getElementById('mGod').textContent = `${state.meters.godPoints} / ${state.meters.godPointsCap}`;
+    document.getElementById('mFood').textContent = state.resources.food;
+    document.getElementById('mMat').textContent = state.resources.materials;
+    document.getElementById('mHappy').textContent = state.meters.happiness;
+    document.getElementById('mSec').textContent = state.meters.security;
+    document.getElementById('oracleCooldown').textContent = `残り ${oracleUsesLeft} 回（このセッション）`;
+  }
+
+  function renderCharacters(){
+    const grid = document.getElementById('charGrid');
+    grid.innerHTML = "";
+    characters.forEach(c=>{
+      const card = document.createElement('div');
+      card.className = 'charcard' + (c.condition.injured?' injured':'') + (c.condition.anxious?' anxious':'');
+
+      const aptLabel = {high:"戦闘：高",medium:"戦闘：中",low:"戦闘：低",none:"戦闘：不可"}[c.combatAptitude];
+
+      card.innerHTML = `
+        <div class="chead">
+          <div class="portrait ${c.cls}">${c.emoji}</div>
+          <div>
+            <div class="cname">${c.name}</div>
+            <div class="crole">${c.role} ・ ${aptLabel}</div>
+          </div>
+        </div>
+        <div class="cstats">
+          ${renderBar('忠誠', c.condition.loyalty, '#e8c96a')}
+          ${c.condition.fatigue!==undefined ? renderBar('疲労', c.condition.fatigue, '#d98a7a') : ''}
+          ${c.condition.morale!==undefined ? renderBar('士気', c.condition.morale, '#9fd18a') : ''}
+        </div>
+        <div class="status-badges">
+          ${c.condition.injured ? '<span class="badge warn">負傷中</span>' : ''}
+          ${c.condition.anxious ? '<span class="badge warn">不安</span>' : ''}
+          ${c.id==='dorn' ? '<span class="badge buff">お告げ解釈補正</span>' : ''}
+          ${c.id==='noah' ? '<span class="badge buff">空気を左右する</span>' : ''}
+          ${c.id==='meia' ? '<span class="badge buff">幸福度ハブ</span>' : ''}
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function renderBar(label, val, color){
+    return `<div class="barrow"><span class="barlabel">${label}</span><div class="bartrack"><div class="barfill" style="width:${val}%;background:${color};"></div></div></div>`;
+  }
+
+  function renderMiracles(){
+    const list = document.getElementById('miracleList');
+    list.innerHTML = "";
+    miracleDefs.forEach(def=>{
+      const row = document.createElement('div');
+      row.className='miracle';
+      row.innerHTML = `
+        <div>
+          <div class="mname">${def.name}</div>
+          <div class="mdesc">${def.desc}</div>
+        </div>
+        <span class="mcost">${def.cost}pt</span>
+        <button class="mbtn" ${state.meters.godPoints<def.cost?'disabled':''}>行使</button>
+      `;
+      row.querySelector('button').addEventListener('click',()=>useMiracle(def));
+      list.appendChild(row);
+    });
+  }
+
+  function renderAll(){
+    document.getElementById('stageTag').textContent = state.stage;
+    renderMeters();
+    renderCharacters();
+    renderMiracles();
+    document.getElementById('sendOracle').disabled = oracleUsesLeft<=0;
+  }
+
+  document.getElementById('sendOracle').addEventListener('click', sendOracle);
+  document.getElementById('tickBtn').addEventListener('click', tick);
+  document.getElementById('resetBtn').addEventListener('click', init);
+  document.getElementById('oracleInput').addEventListener('keydown', (e)=>{
+    if(e.key==='Enter' && (e.metaKey||e.ctrlKey)) sendOracle();
+  });
+
+  init();
+})();
+</script>
+</body>
+</html>

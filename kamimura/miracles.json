@@ -1,0 +1,54 @@
+{
+  "miracles": [
+    {
+      "id": "blessed_rain",
+      "name": "恵みの雨",
+      "cost": 1,
+      "effect": "foodProductionPercent+50 for 10min",
+      "description": "一定時間、食料生産効率+50%"
+    },
+    {
+      "id": "clear_sky",
+      "name": "晴天の加護",
+      "cost": 1,
+      "effect": "buildSpeedPercent+30 for 10min",
+      "description": "一定時間、建築・移動速度+30%"
+    },
+    {
+      "id": "warning_wind",
+      "name": "追い風の予兆",
+      "cost": 2,
+      "effect": "revealNextThreatEta + threatChancePercent-20 for 15min",
+      "description": "次の敵襲の発生タイミングを事前通知し、発生率を一時的に下げる"
+    },
+    {
+      "id": "thunder_wrath",
+      "name": "雷雲の怒り",
+      "cost": 3,
+      "effect": "nextBattleEnemyPowerPercent-30",
+      "description": "次の戦闘で敵の戦闘力を一定割合減少させる"
+    },
+    {
+      "id": "healing_light",
+      "name": "傷の癒し",
+      "cost": 2,
+      "effect": "healTargetCharacterFully",
+      "description": "負傷中のキャラを即座に全回復"
+    },
+    {
+      "id": "guiding_light",
+      "name": "導きの光",
+      "cost": 3,
+      "effect": "nextRecruitQualityGuaranteedGood",
+      "description": "次に加入する村人が確定でランダムより良い能力を持つ"
+    },
+    {
+      "id": "small_miracle_noah",
+      "name": "小さな奇跡",
+      "cost": 1,
+      "targetCharacterId": "noah",
+      "effect": "clearAnxiety + moraleBuffConfirmed",
+      "description": "ノアの不安状態を強制的に解消し、幸福度バフを確定発生させる"
+    }
+  ]
+}

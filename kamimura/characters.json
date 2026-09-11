@@ -1,0 +1,129 @@
+{
+  "characters": [
+    {
+      "id": "gain",
+      "name": "ガイン",
+      "role": "戦士",
+      "isFounder": true,
+      "temperament": "勤勉",
+      "stats": {
+        "combatPower": 80,
+        "combatAptitude": "high",
+        "workTendency": {
+          "frontier": 25,
+          "production": 15,
+          "combat": 50,
+          "faith": 5,
+          "commerce": 5
+        }
+      },
+      "condition": {
+        "loyalty": 60,
+        "fatigue": 10,
+        "morale": 70,
+        "injured": false
+      },
+      "traits": ["寡黙", "責任感が強い", "過去に守れなかったものがある"],
+      "specialEffect": null,
+      "flags": {
+        "hasToldBackstory": false
+      }
+    },
+    {
+      "id": "meia",
+      "name": "メイア",
+      "role": "女性",
+      "isFounder": true,
+      "temperament": "勤勉",
+      "stats": {
+        "combatPower": 15,
+        "combatAptitude": "low",
+        "workTendency": {
+          "frontier": 5,
+          "production": 55,
+          "combat": 5,
+          "faith": 10,
+          "commerce": 25
+        }
+      },
+      "condition": {
+        "loyalty": 65,
+        "fatigue": 10,
+        "morale": 75,
+        "injured": false
+      },
+      "traits": ["明るい", "現実的", "ノアを実の子のように守っている"],
+      "specialEffect": {
+        "type": "happiness_hub",
+        "description": "メイアの疲労度が高いと村全体の幸福度に負の影響が波及する"
+      },
+      "flags": {}
+    },
+    {
+      "id": "noah",
+      "name": "ノア",
+      "role": "子供",
+      "isFounder": true,
+      "temperament": "好奇心旺盛",
+      "stats": {
+        "combatPower": 0,
+        "combatAptitude": "none",
+        "workTendency": {
+          "frontier": 0,
+          "production": 0,
+          "combat": 0,
+          "faith": 0,
+          "commerce": 0
+        }
+      },
+      "condition": {
+        "loyalty": 100,
+        "fatigue": 0,
+        "morale": 90,
+        "injured": false,
+        "anxious": false
+      },
+      "traits": ["神の存在を無邪気に信じている", "戦力にならないが空気を左右する"],
+      "specialEffect": {
+        "type": "morale_aura",
+        "description": "ノアが元気な間、周囲の幸福度と忠誠度に微量のプラス補正。不安状態だとマイナス補正",
+        "buffValue": 3,
+        "debuffValue": -3
+      },
+      "flags": {}
+    },
+    {
+      "id": "dorn",
+      "name": "ドルン",
+      "role": "おじいさん",
+      "isFounder": true,
+      "temperament": "飄々",
+      "stats": {
+        "combatPower": 25,
+        "combatAptitude": "medium",
+        "workTendency": {
+          "frontier": 10,
+          "production": 10,
+          "combat": 10,
+          "faith": 40,
+          "commerce": 30
+        }
+      },
+      "condition": {
+        "loyalty": 70,
+        "fatigue": 5,
+        "morale": 80,
+        "injured": false
+      },
+      "traits": ["知恵者", "世界の成り立ちを何か知っている"],
+      "specialEffect": {
+        "type": "oracle_precision_boost",
+        "description": "ドルンが村にいる間、お告げの解釈ズレ（未知・曖昧判定）の発生率が下がる",
+        "fallbackReductionPercent": 30
+      },
+      "flags": {
+        "hasHintedLore": false
+      }
+    }
+  ]
+}

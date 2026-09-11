@@ -1,0 +1,27 @@
+{
+  "stage": "開拓期",
+  "population": 4,
+  "resources": {
+    "food": 30,
+    "materials": 20,
+    "faithStone": 0
+  },
+  "meters": {
+    "faith": 0,
+    "godPoints": 0,
+    "godPointsCap": 5,
+    "happiness": 70,
+    "security": 50
+  },
+  "threat": {
+    "nextEventEtaMinutes": null,
+    "lastEventResult": null
+  },
+  "storyFlags": {
+    "baseFound": false,
+    "introShown": false,
+    "firstBattleWon": false,
+    "populationExceeded5": false
+  },
+  "log": []
+}

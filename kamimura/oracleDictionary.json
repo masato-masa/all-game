@@ -1,0 +1,80 @@
+{
+  "categories": [
+    {
+      "id": "frontier",
+      "label": "開拓・拡大",
+      "keywords": ["広げろ", "開拓", "新天地", "土地", "進め", "拡大"],
+      "effects": {
+        "workTendency.frontier": 15,
+        "resources.materials": -5
+      }
+    },
+    {
+      "id": "production",
+      "label": "農業・生産",
+      "keywords": ["畑", "耕せ", "実り", "収穫", "育てろ", "育て"],
+      "effects": {
+        "resources.food": 20,
+        "condition.fatigue": 5
+      }
+    },
+    {
+      "id": "combat",
+      "label": "戦闘・防衛",
+      "keywords": ["戦え", "守れ", "敵", "武器", "備えよ", "備える", "戦闘"],
+      "effects": {
+        "workTendency.combat": 15,
+        "meters.security": 10,
+        "meters.happiness": -5,
+        "note": "combatAptitude が none のキャラには適用されず、代わりに supportValue+10として処理"
+      }
+    },
+    {
+      "id": "faith",
+      "label": "信仰・儀式",
+      "keywords": ["祈れ", "捧げよ", "感謝", "祭り", "神殿", "祈り"],
+      "effects": {
+        "meters.faith": 10,
+        "condition.loyalty": 5,
+        "resources.materials": -5
+      }
+    },
+    {
+      "id": "commerce",
+      "label": "商業・交易",
+      "keywords": ["売れ", "買え", "商人", "交易", "市場"],
+      "effects": {
+        "resourceConversionBonusPercent": 15
+      }
+    },
+    {
+      "id": "rest",
+      "label": "休息・慈愛",
+      "keywords": ["休め", "癒せ", "労われ", "優しく", "休息"],
+      "effects": {
+        "condition.fatigue": -15,
+        "meters.happiness": 10,
+        "productionEfficiencyPercent": -5
+      }
+    },
+    {
+      "id": "discipline",
+      "label": "規律・統制",
+      "keywords": ["従え", "厳しく", "罰せよ", "規律"],
+      "effects": {
+        "meters.security": 15,
+        "meters.happiness": -10,
+        "defectionRatePercent": -5
+      }
+    }
+  ],
+  "fallback": {
+    "id": "unknown",
+    "label": "未知・曖昧",
+    "effects": {
+      "randomEventChancePercent": 20,
+      "message": "村人たちはお告げの意味を測りかねている"
+    }
+  },
+  "ngWordReplacementMessage": "??? という不思議なお告げが届いた"
+}

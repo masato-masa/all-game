@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>名もなき神 ― 村育成放置</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Serif+JP:wght@400;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css?v=9">
+</head>
+<body>
+
+<!-- ============ ヘッダー ============ -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="title-row">
+      <h1>名もなき神</h1>
+    </div>
+    <div class="topbar-right">
+      <span class="clock" id="clock">1日目 00:00</span>
+      <div class="audio-box">
+        <button class="btn-ghost tiny" id="musicBtn" title="音楽">♪</button>
+        <input type="range" id="volSlider" min="0" max="1" step="0.05" value="0.55" title="音量">
+      </div>
+      <div class="speed" id="speedBox">
+        <button data-speed="1" class="on">×1</button>
+        <button data-speed="4">×4</button>
+        <button data-speed="16">×16</button>
+      </div>
+      <button class="btn-ghost tiny" id="menuBtn">≡</button>
+    </div>
+  </div>
+  <div class="meterbar" id="meterbar">
+    <div class="meter god"><div class="label">神ポイント</div><div class="val" id="mGod">0/5</div><div class="sub" id="mGodSub">奇跡に使う</div></div>
+  </div>
+</header>
+
+<!-- ============ メイン ============ -->
+<main class="wrap">
+  <div class="layout">
+
+    <!-- 地図（主役） -->
+    <section class="panel map-panel">
+      <h2>神の地図 <span class="h2sub" id="siteName">―</span></h2>
+      <div class="map-holder">
+        <canvas id="mapCanvas"></canvas>
+        <div class="map-tip hidden" id="mapTip"></div>
+      </div>
+      <div class="map-legend">
+        村人をクリックすると、声をかけられます。
+      </div>
+
+      <!-- 会話 -->
+      <div class="speechbar idle" id="speechBar">
+        <div class="sp-face" id="spFace"></div>
+        <div class="sp-body">
+          <div class="sp-name" id="spName">村のようす</div>
+          <div class="sp-text" id="spText">民は自分たちで考えて働き、必要なものを自分たちで建てます。あなたにできるのは、言葉を降ろすことだけ。</div>
+        </div>
+      </div>
+
+      <div class="map-foot" id="buildStatus">村人たちは、何を建てるか自分で決めます。</div>
+    </section>
+
+    <!-- 左：民 -->
+    <div class="col">
+      <section class="panel">
+        <h2>民</h2>
+        <div class="chars" id="charGrid"></div>
+      </section>
+    </div>
+
+    <!-- 右：介入 -->
+    <div class="col">
+      <section class="panel threat" id="threatPanel">
+        <h2>脅威</h2>
+        <div class="threat-body">
+          <div class="threat-main" id="threatText">森は静かだ。</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>お告げ <span class="h2sub">間接介入</span></h2>
+        <textarea id="oracleInput" maxlength="60" placeholder="例：畑を耕せ／敵に備えよ／少し休め&#10;――言葉は、いつも正しく伝わるとは限らない"></textarea>
+        <div class="oracle-row">
+          <button class="btn-primary" id="sendOracle">お告げを送る</button>
+          <span class="cooldown" id="oracleCooldown">残り 3 / 3</span>
+        </div>
+        <div class="chips" id="oracleChips"></div>
+      </section>
+
+      <section class="panel">
+        <h2>奇跡 <span class="h2sub">直接介入・確定効果</span></h2>
+        <div class="miracles" id="miracleList"></div>
+      </section>
+
+      <section class="panel">
+        <h2>出来事の記録</h2>
+        <div class="log" id="logList"></div>
+      </section>
+    </div>
+  </div>
+  <div class="footer-note">
+    地図はドラッグで見回せます（ホイールで寄り引き）。地形・建物・村人はすべてその場で組み立てられた3Dです。
+    進行はlocalStorageに自動保存され、閉じている間も最大8時間ぶん計算されます。
+  </div>
+</main>
+
+<!-- ============ モーダル群 ============ -->
+<div class="overlay hidden" id="overlay">
+
+  <div class="modal hidden" id="mdIntro">
+    <div class="intro-scene">
+      <div class="intro-figures">👤 👤 👤 👤</div>
+    </div>
+    <div class="narration" id="introText"></div>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="introSkip">読み飛ばす</button>
+      <button class="btn-primary" id="introNext">つづき</button>
+    </div>
+  </div>
+
+  <div class="modal wide hidden" id="mdSite">
+    <h3>はじめてのお告げ ― 拠点を探せ</h3>
+    <p class="modal-lead">神の目にだけ、4つの候補地が映っている。<br>言葉で導くしかない。どこへ向かわせる？</p>
+    <div class="sites" id="siteChoices"></div>
+    <textarea id="siteInput" maxlength="40" placeholder="例：川の方へ行け／安全な場所へ／高いところを目指せ"></textarea>
+    <div class="modal-actions">
+      <button class="btn-primary" id="siteSend">お告げを送る</button>
+    </div>
+    <p class="modal-foot">※ここでのお告げは「解釈のズレ」を体験するチュートリアルです。どこを選んでも詰みません。</p>
+  </div>
+
+  <div class="modal hidden" id="mdEvent">
+    <div class="event-faces" id="eventFaces"></div>
+    <h3 id="eventTitle">―</h3>
+    <div class="narration" id="eventBody"></div>
+    <div class="modal-actions">
+      <button class="btn-primary" id="eventOk">閉じる</button>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="mdDigest">
+    <h3>おかえりなさい</h3>
+    <div class="digest-time" id="digestTime"></div>
+    <div class="digest-list" id="digestList"></div>
+    <div class="modal-actions">
+      <button class="btn-primary" id="digestOk">村を見る</button>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="mdBattle">
+    <h3 id="battleTitle">襲撃</h3>
+    <div class="battle-vs">
+      <div class="side"><div class="side-label">村</div><div class="side-val" id="battleUs">0</div></div>
+      <div class="vs">VS</div>
+      <div class="side"><div class="side-label" id="battleEnemyName">魔物</div><div class="side-val enemy" id="battleThem">0</div></div>
+    </div>
+    <div class="narration" id="battleBody"></div>
+    <div class="modal-actions">
+      <button class="btn-primary" id="battleOk">確認</button>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="mdMenu">
+    <h3>メニュー</h3>
+    <div class="menu-list">
+      <button class="btn-ghost wide-btn" id="menuHelp">遊び方とお告げのコツ</button>
+      <button class="btn-ghost wide-btn" id="menuSave">いま保存する</button>
+      <button class="btn-ghost wide-btn danger" id="menuReset">最初からやり直す</button>
+      <button class="btn-primary wide-btn" id="menuClose">閉じる</button>
+    </div>
+  </div>
+
+  <div class="modal wide hidden" id="mdHelp">
+    <h3>遊び方</h3>
+    <div class="help-body" id="helpBody"></div>
+    <div class="modal-actions"><button class="btn-primary" id="helpOk">閉じる</button></div>
+  </div>
+</div>
+
+<div class="toast-area" id="toastArea"></div>
+
+<script src="assets/lib/three.min.js"></script>
+<script src="js/data.js?v=9"></script>
+<script src="js/portraits.js?v=9"></script>
+<script src="js/audio.js?v=9"></script>
+<script src="js/state.js?v=9"></script>
+<script src="js/oracle.js?v=9"></script>
+<script src="js/scene3d.js?v=9"></script>
+<script src="js/world.js?v=9"></script>
+<script src="js/engine.js?v=9"></script>
+<script src="js/ui.js?v=9"></script>
+<script src="js/main.js?v=9"></script>
+</body>
+</html>
