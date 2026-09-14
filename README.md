@@ -12,6 +12,7 @@
 | ねこめいろ | https://masato-masa.github.io/cat-maze/ | [cat-maze](https://github.com/masato-masa/cat-maze) |
 | にゃんどく | https://masato-masa.github.io/nyandoku/ | [nyandoku](https://github.com/masato-masa/nyandoku) |
 | 名もなき神 | https://masato-masa.github.io/all-game/kamimura/ | [kamimura](https://github.com/masato-masa/all-game/tree/main/kamimura)（このリポジトリ内） |
+| キングパズル | https://masato-masa.github.io/king-puzzle/ | [king-puzzle](https://github.com/masato-masa/king-puzzle) |
 | アルバム（ゲームではない） | https://masato-masa.github.io/7242/ | [7242](https://github.com/masato-masa/7242) |
 
 一覧は `index.html` 1枚だけの静的ページ。`kamimura/` には「名もなき神」本体を同梱している
