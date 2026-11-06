@@ -16,6 +16,7 @@
 | シティビルダーズ | https://masato-masa.github.io/city-builders/ | [city-builders](https://github.com/masato-masa/city-builders) |
 | むじんとうスローライフ | https://masato-masa.github.io/survival-island/ | [survival-island](https://github.com/masato-masa/survival-island) |
 | リアルカードバトル | https://masato-masa.github.io/riale-cardbatlle/ | [riale-cardbatlle](https://github.com/masato-masa/riale-cardbatlle) |
+| ガゾデュエル | https://masato-masa.github.io/gazo-duel/ | [gazo-duel](https://github.com/masato-masa/gazo-duel) |
 | アルバム（ゲームではない） | https://masato-masa.github.io/7242/ | [7242](https://github.com/masato-masa/7242) |
 
 一覧は `index.html` 1枚だけの静的ページ。`kamimura/` には「名もなき神」本体を同梱している
